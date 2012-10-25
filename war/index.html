@@ -10,18 +10,23 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Hello App Engine</title>
+    <link rel="stylesheet" href="/skin/fileuploader.css">
   </head>
 
   <body>
     <h1>Hello App Engine!</h1>
-	
-    <table>
-      <tr>
-        <td colspan="2" style="font-weight:bold;">Available Servlets:</td>        
-      </tr>
-      <tr>
-        <td><a href="mygallery">MyGallery</a></td>
-      </tr>
-    </table>
+    <div id="fileUploader"></div>
+    <script src="/js/fileuploader.js"></script>
+    <script type="text/javascript">
+    function createUploader() {
+        var uploader = new qq.FileUploader({
+            element: document.getElementById('fineUploader'),
+            // Use the relevant server script url here
+            action: 'yourServerScript'
+        });
+    }
+
+    window.onload = createUploader;
+    </script>
   </body>
 </html>
