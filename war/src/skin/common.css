@@ -1,0 +1,54 @@
+/* close icon 32x32 */
+.icon-close {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    _zoom: 1;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    vertical-align: text-bottom;
+    color: #FFF;
+    text-indent: -9999px;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: red;
+    -webkit-border-radius: 16px;
+       -moz-border-radius: 16px;
+        -ms-border-radius: 16px;
+         -o-border-radius: 16px;
+            border-radius: 16px;
+    -webkit-box-shadow: 0px 1px 2px #333;
+       -moz-box-shadow: 0px 1px 2px #333;
+        -ms-box-shadow: 0px 1px 2px #333;
+         -o-box-shadow: 0px 1px 2px #333;
+            box-shadow: 0px 1px 2px #333;
+}
+    .icon-close::before,
+    .icon-close::after {
+        display: none\9;
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -10px;
+        margin-left: -3px;
+        height: 20px;
+        width: 6px;
+        background-color: #FFF;
+    }
+    .icon-close::before {
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    .icon-close::after {
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+    }

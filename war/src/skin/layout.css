@@ -1,0 +1,66 @@
+body {
+    overflow: hidden;
+}
+
+/* layout */
+.overlay,
+.container {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    background: #FFF;
+    overflow: hidden;
+}
+.overlay {
+    width: 100%;
+    z-index: 999;
+}
+.overlay.overlay-hide {
+    display: none;
+}
+
+.side,
+.main {
+    position: relative;
+    z-index: 1;
+    float: left;
+    width: 50%;
+    height: 100%;
+    -webkit-transition: .2s all ease;
+       -moz-transition: .2s all ease;
+        -ms-transition: .2s all ease;
+         -o-transition: .2s all ease;
+            transition: .2s all ease;
+}
+
+/* side */
+.side {
+    margin-left: -45%;
+    width: 45%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #CCC;
+}
+
+/* main */
+.main {
+    margin-left: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    -webkit-box-shadow: -1px 0 5px #888;
+       -moz-box-shadow: -1px 0 5px #888;
+        -ms-box-shadow: -1px 0 5px #888;
+         -o-box-shadow: -1px 0 5px #888;
+            box-shadow: -1px 0 5px #888;
+}
+
+/* show-side */
+.show-side .main {
+    margin-left: 0;
+}
+.show-side .side {
+    margin-left: 0;
+}

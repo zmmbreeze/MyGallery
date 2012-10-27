@@ -1,0 +1,50 @@
+/* uploader */
+.uploader {
+    margin-top: 3em;
+    text-align: center;
+}
+    .uploader input {
+        -webkit-appearance: none;
+                appearance: none;
+    }
+    .uploader ul {
+        margin: 1em 0;
+        overflow: hidden;
+        text-align: left;
+    }
+        .uploader ul li {
+            margin-bottom: 0.2em;
+            padding: 1em;
+            list-style: none;
+            color: #333;
+            background-color: #E6E6E6;
+            -webkit-box-shadow: 0px 1px 2px #666;
+               -moz-box-shadow: 0px 1px 2px #666;
+                -ms-box-shadow: 0px 1px 2px #666;
+                 -o-box-shadow: 0px 1px 2px #666;
+                    box-shadow: 0px 1px 2px #666;
+        }
+        .uploader ul .gui-multiple-error {
+            background-color: red;
+        }
+        .uploader ul .gui-multiple-timeout {
+            color: #EEE;
+            background-color: purple;
+        }
+        .uploader ul .gui-multiple-abort {
+            color: #EEE;
+            background-color: black;
+        }
+        .uploader ul .gui-multiple-success {
+            color: #EEE;
+            background-color: green;
+        }
+        .uploader ul .gui-multiple-uploading {
+            color: #EEE;
+            background-color: blue;
+        }
+        .uploader ul .gui-multiple-waiting {
+            background-color: yellow;
+        }
+
+
