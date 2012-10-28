@@ -36,6 +36,7 @@
         left: 1em;
         margin-top: -0.85em;
         padding: 0.2em 0.5em;
+        font-size: 0.8em;
         text-decoration: none;
         color: #FFF;
         background-color: #AAA;
@@ -44,6 +45,9 @@
             -ms-border-radius: 0.2em;
              -o-border-radius: 0.2em;
                 border-radius: 0.2em;
+    }
+    .no-inputfile .header-setup {
+        display: none;
     }
     .header-setup:hover,
     .header-edit:hover,
@@ -80,6 +84,23 @@
                 -ms-box-shadow: 1px 1px 3px #CCC;
                  -o-box-shadow: 1px 1px 3px #CCC;
                     box-shadow: 1px 1px 3px #CCC;
+        }
+        .pictures li p {
+            width: 100%;
+            line-height: 1.5;
+            font-weight: bold;
+            text-align: center;
+            color: #FFF;
+            opacity: 0.8;
+            background-color: #333;
+        }
+        /* not support ie6 */
+        .pictures li:hover p,
+        .start-edit .pictures li p {
+            display: block;
+            position: absolute;
+            left: 0;
+            bottom: 0;
         }
         .pictures li p,
         .pictures li .icon-close {

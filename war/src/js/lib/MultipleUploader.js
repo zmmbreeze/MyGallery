@@ -1,27 +1,78 @@
 /**
- * 用于多文件上传的组件
+ *  用于多文件上传的组件
  *  对于支持multiple属性的浏览器一次选择多份文件
+ *  HTML由三部分组成
+ *     上传input框 buttonTmpl
+ *     拖动上传框 dragTmpl
+ *     文件列表框 viewTmpl + fileViewTmpl
  *
+ *  返回数据必须是json格式
+ *      正确格式：{}
+ *      错误格式：{error: 1, msg: '提示信息'}
+ *  事件：
+ *      addTooManyFiles 添加了超过限制的文件，参数(input/file, count)
+ *      abort           强制停止上传，参数(id)
+ *      timeout         上传超时，参数(id)
+ *      waiting         等待上传中，参数(id)
+ *      uploading       正在提交，参数(id)
+ *      stateChange     上传状态改变，参数(id, state)
+ *      success         上传成功，参数(id, data)
+ *      error           上传失败，参数(id, data)
+ *      progress        提交过程，参数(id, loaded, total)
  *
+ *  CSS HOOK:
+ *      文件列表(前缀参数stateClassPrefix)
+ *          .gui-multiple-error
+ *          .gui-multiple-timeout
+ *          .gui-multiple-abort
+ *          .gui-multiple-success
+ *          .gui-multiple-uploading
+ *          .gui-multiple-waiting
+ *      拖动框(前缀参数dragStateClassPrefix)
+ *          .gui-multiple-drag-enter
+ *
+ *  API:
+ *      Statics method:
+ *          Uploader.isSupported();
+ *          Uploader.supportDrag();
+ *          Uploader.supportXhr();
+ *          Uploader.pushIfExist(array, v);
+ *          Uploader.removeIfExist(array, v);
+ *      normal method:
+ *          uploader.remove();
+ *          uploader.getFileView(id);
+ *          uploader.getUpload(id);
+ *          uploader.abort(id);
+ *          uploader.getFileName(id);
+ *          uploader.upload(id);
+ *
+ *  @author mzhou
+ *  @log 0.1 init
  */
 
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
 /*global G:false, $:false */
 
+//@import "./Event.js";
+//
 G.def('MultipleUploader', ['Event'], function(Event) {
     'use strict';
     var defaultOption = {
-            buttonTmpl: '<input type="file" name="{v}" />',
+            buttonTmpl: '<input type="file" name="{v}" size="10"/>',
             viewTmpl: '<ul></ul>',
-            fileView: '<li data-id="{id}">{filename}</li>',
+            fileViewTmpl: '<li data-id="{id}">{filename}</li>',
+            dragTmpl: '<div class="gui-multiple-drag-area">将文件拖到此处上传</div>',
+            // dragSelector: '#draggable',
             name: 'fileUploader',
             uploadOnChange: false,
             maxCount: 10,
             maxConnection: 2,
             defaultFailMsg: '上传失败',
             stateClassPrefix: 'gui-multiple-',
-            timeout: 10000
+            dragStateClassPrefix: 'gui-multiple-drag',
+            timeout: 10000,
+            forceUseForm: false
         },
         uniqueId = 0;
 
@@ -33,6 +84,8 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         self.uploadUrl = url;
         // option
         self._option = $.extend({}, defaultOption, option);
+        // upload name
+        self.uploadName = self._option.name;
         // upload data, 不支持复杂的数据，比如数组
         self._params = self._option.params || {};
         // max uploaded file number
@@ -95,6 +148,37 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return this;
     };
 
+    /**
+     * 检查input是否支持type="file"
+     *
+     */
+    Uploader.isSupported = function() {
+        var input = document.createElement('input'),
+            support = false;
+        input.type = 'file';
+        // ios < 6, 会设置input为disabled
+        if (input.type === 'file' && !input.disabled) {
+            support = true;
+        }
+        this.isSupported = function() {
+            return support;
+        };
+        return support;
+    };
+
+    /**
+     * 是否支持drag和drop
+     *
+     */
+    Uploader.supportDrag = function() {
+        var div = document.createElement('div'),
+            support = ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div);
+        this.supportDrag = function() {
+            return support;
+        };
+        return support;
+    };
+
     Uploader.supportXhr = function() {
         var input = document.createElement('input'),
             support;
@@ -145,8 +229,23 @@ G.def('MultipleUploader', ['Event'], function(Event) {
      * init
      */
     Uploader.prototype._init = function() {
+        this._setupButton();
+        if (this.constructor.supportDrag() &&
+            this.constructor.supportXhr() &&
+            !this._option.forceUseForm) {
+            this._setupDrag();
+        }
+        this.$view = $(this._option.viewTmpl);
+        this.$container.append(this.$view);
+    };
+
+    Uploader.prototype._setupButton = function() {
         var self = this;
-        self._newButton();
+        self.$container.html( G.format(self._option.buttonTmpl, self._option.name) );
+        self.$button = self.$container.find('input[type=file]');
+        if (self.constructor.supportXhr() && !this._option.forceUseForm) {
+            self.$button.attr('multiple', 'mulitple');
+        }
         self.$button.change(function onChange() {
             var $this = $(this),
                 $clone = $this.clone(),
@@ -165,16 +264,35 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         });
     };
 
-    Uploader.prototype._newButton = function() {
-        this.$container.html( G.format(this._option.buttonTmpl, this._option.name) );
-        this.$button = this.$container.find('input[type=file]');
-        // name of input
-        this.uploadName = this.$button.attr('name');
-        this.$view = $(this._option.viewTmpl);
-        this.$container.append(this.$view);
-        if (this.constructor.supportXhr()) {
-            this.$button.attr('multiple', 'mulitple');
-        }
+    Uploader.prototype._setupDrag = function() {
+        var self = this;
+        self.$drag = $(G.format(self._option.dragTmpl));
+        self.$container.append(self.$drag);
+        self.$drag.attr('draggable', 'draggable');
+        self.$drag
+            .bind('dragenter.uploader', function() {
+                self.$drag.addClass(self._option.dragStateClassPrefix + 'enter');
+                self.fire('dragenter');
+            })
+            .bind('dragleave.uploader', function(e) {
+                self.$drag.removeClass(self._option.dragStateClassPrefix + 'enter');
+                self.fire('dragleave');
+            })
+            .bind('drop.uploader', function(e) {
+                e.preventDefault();
+                var i = 0,
+                    fileList = e.originalEvent.dataTransfer.files,
+                    l = fileList.length,
+                    file,
+                    id;
+                for (; i<l; i++) {
+                    file = fileList[i];
+                    id = self._addOneUpload(file);
+                    if (self._option.uploadOnChange) {
+                        self.upload(id);
+                    }
+                }
+            });
     };
 
     Uploader.prototype._getUploadId = function() {
@@ -188,7 +306,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
      * @return {string/array} id 返回分配的id，如果浏览器支持multiple则返回id的数组
      */
     Uploader.prototype._addUpload = function(input) {
-        if (this.constructor.supportXhr()) {
+        if (this.constructor.supportXhr() && !this._option.forceUseForm) {
             var i = 0,
                 fileList = input.files,
                 l = fileList.length,
@@ -217,9 +335,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         this._queue.push(id);
         this.count++;
 
-        $fileView = $(G.format(this._option.fileView, {id: id, filename: this.getFileName(id) }));
+        $fileView = $(G.format(this._option.fileViewTmpl, {id: id, filename: this.getFileName(id) }));
         this._fileViews[id] = $fileView[0];
-        this.$view.append($fileView);
+        this.$view.prepend($fileView);
         return id;
     };
 
@@ -249,7 +367,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
      *
      */
     Uploader.prototype.getFileName = function(id) {
-        if (this.constructor.supportXhr()) {
+        if (this.constructor.supportXhr() && !this._option.forceUseForm) {
             var file = this._uploads[id];
             return file.fileName != null ? file.fileName : file.name;
         } else {
@@ -298,7 +416,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         params = $.extend(this._params, {filename: encodeURIComponent(fileName)});
 
         // upload
-        if (this.constructor.supportXhr()) {
+        if (this.constructor.supportXhr() && !this._option.forceUseForm) {
             this._uploadByXhr(id, params);
         } else {
             this._uploadByForm(id, params);
@@ -385,7 +503,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
                     try {
                         data = $.parseJSON(data);
                     } catch(e) {
-                        data = {error: 3, msg: '返回数据解析错误，必须是json格式'};
+                        data = {error: 3, msg: self._option.defaultFailMsg};
                     }
                     if (data.error == null) {
                         self.fire('success', id, data);
@@ -459,6 +577,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
             } catch (e) {
                 data = {error: 1, msg: self._option.defaultFailMsg};
             }
+
             if (data.error == null) {
                 self.fire('success', id, data);
                 state = self.constructor.state.SUCCESS;
@@ -467,7 +586,10 @@ G.def('MultipleUploader', ['Event'], function(Event) {
                 state = self.constructor.state.ERROR;
             }
             self._finishConnection(id, state);
-            //$iframe.remove();//TODO: 这样 remove 会造成网页 favicon 一直在转圈浏览器一直显示正在 loading
+            // 使用timeout避免 remove 会造成网页 favicon 一直在转圈浏览器一直显示正在 loading
+            setTimeout(function() {
+                $iframe.remove();
+            }, 50);
         });
 
         this._abortFunc[id] = function() {
@@ -502,7 +624,18 @@ G.def('MultipleUploader', ['Event'], function(Event) {
     };
 
     Uploader.prototype.remove = function() {
-
+        var self = this;
+        self.$drag = null;
+        self.$button = null;
+        self.$container.html('');
+        self.$container = null;
+        self._option = null;
+        self._abortFunc = null;
+        self._connections = null;
+        self._waiting = null;
+        self._queue = null;
+        self._fileViews = null;
+        self._uploads = null;
     };
 
     return Uploader;

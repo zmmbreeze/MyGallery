@@ -1,11 +1,17 @@
 /* uploader */
+.no-inputfile .side {
+    display: none;
+}
 .uploader {
+    display: none;
     margin-top: 3em;
     text-align: center;
 }
+.js .uploader {
+    display: block;
+}
     .uploader input {
-        -webkit-appearance: none;
-                appearance: none;
+        margin-left: 0.5em;
     }
     .uploader ul {
         margin: 1em 0;
@@ -46,5 +52,30 @@
         .uploader ul .gui-multiple-waiting {
             background-color: yellow;
         }
+    .uploader .gui-multiple-drag-area {
+        display: none;
+        margin: 1em 0.5em;
+        padding: 1em;
+        color: #C09853;
+        background-color: #FCF8E3;
+        border: 1px solid #FBEED5;
+        -webkit-border-radius: 4px;
+           -moz-border-radius: 4px;
+                border-radius: 4px;
+        -webkit-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+           -moz-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
 
+/* for desktop */
+@media all and (min-width: 1025px) {
+    .uploader .gui-multiple-drag-area {
+        display: block;
+    }
+    .uploader .gui-multiple-drag-area.gui-multiple-dragenter {
+        color: #3A87AD;
+        background-color: #D9EDF7;
+        border-color: #BCE8F1;
+    }
+}
 

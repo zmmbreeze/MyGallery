@@ -52,3 +52,14 @@
         -ms-transform: rotate(-45deg);
         transform: rotate(-45deg);
     }
+
+/* ellipsis */
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    -webkit-text-overflow: ellipsis;
+       -moz-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+         -o-text-overflow: ellipsis;
+            text-overflow: ellipsis;
+}

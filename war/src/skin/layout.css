@@ -1,9 +1,6 @@
-body {
-    overflow: hidden;
-}
-
 /* layout */
-.overlay,
+.container-wp,
+/* .overlay, */
 .container {
     position: absolute;
     z-index: 1;
@@ -14,13 +11,20 @@ body {
     background: #FFF;
     overflow: hidden;
 }
+.container-wp {
+    width: 100%;
+}
+/* TODO
 .overlay {
     width: 100%;
     z-index: 999;
+    opacity: 0.8;
+    background-color: #333;
 }
 .overlay.overlay-hide {
     display: none;
 }
+*/
 
 .side,
 .main {
@@ -29,6 +33,8 @@ body {
     float: left;
     width: 50%;
     height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
     -webkit-transition: .2s all ease;
        -moz-transition: .2s all ease;
         -ms-transition: .2s all ease;
@@ -40,16 +46,12 @@ body {
 .side {
     margin-left: -45%;
     width: 45%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
     background-color: #CCC;
 }
 
 /* main */
 .main {
     margin-left: 0;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
     -webkit-box-shadow: -1px 0 5px #888;
        -moz-box-shadow: -1px 0 5px #888;
         -ms-box-shadow: -1px 0 5px #888;
@@ -63,4 +65,25 @@ body {
 }
 .show-side .side {
     margin-left: 0;
+}
+
+/* for desktop */
+@media all and (min-width: 1025px) {
+    .side {
+        margin-left: 0;
+        width: 10%;
+        background-color: #EEE;
+        border-right: 1px solid #BBB;
+    }
+    .main {
+        width: 40%;
+        -webkit-box-shadow: none;
+           -moz-box-shadow: none;
+            -ms-box-shadow: none;
+             -o-box-shadow: none;
+                box-shadow: none;
+    }
+        .header-setup {
+            display: none;
+        }
 }

@@ -27,8 +27,12 @@ public class EncodeFilter implements Filter {
 
        request.setCharacterEncoding(this.encoding);
        response.setCharacterEncoding(this.encoding);
+       // for cross origin
+       response.setHeader("Access-Control-Allow-Headers", "origin, x-requested-with, x-file-name, content-type, cache-control");
+       response.setHeader("Access-Control-Request-Method", "POST");
+       response.setHeader("Access-Control-Allow-Origin", "*");
 
-       chain.doFilter(req, res);	
+       chain.doFilter(req, res);
 	}
 
 	@Override
