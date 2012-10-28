@@ -13,6 +13,7 @@ G.def('./gallery/setupLayout', function() {
         $main = $('#main'),
         $showSide = $('#showSide'),
         sideShowing = false;
+    // 显示与隐藏侧栏
     $showSide.click(function() {
         if ($container.hasClass('show-side')) {
             $container.removeClass('show-side');
@@ -22,8 +23,10 @@ G.def('./gallery/setupLayout', function() {
             sideShowing = true;
         }
     });
+    // 回到主栏
     $main.click(function(e) {
         if (sideShowing && e.target !== $showSide[0]) {
+            e.preventDefault();
             $container.removeClass('show-side');
             sideShowing = false;
         }

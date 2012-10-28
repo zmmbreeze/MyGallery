@@ -36,7 +36,7 @@
  *          Uploader.isSupported();
  *          Uploader.supportDrag();
  *          Uploader.supportXhr();
- *          Uploader.pushIfExist(array, v);
+ *          Uploader.pushIfNotExist(array, v);
  *          Uploader.removeIfExist(array, v);
  *      normal method:
  *          uploader.remove();
@@ -125,6 +125,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
     }
     Event.extend(Uploader);
 
+    /**
+     * 请求的状态
+     */
     Uploader.state = {
         SUCCESS: 'success',
         WAITING: 'waiting',
@@ -134,6 +137,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         ABORT: 'abort'
     };
 
+    /**
+     * 设置fileView的状态
+     */
     Uploader.setStateClass = function(dom, state, prefix) {
         var k, v,
             $dom = $(dom),
@@ -179,6 +185,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return support;
     };
 
+    /**
+     * 是否支持xhr
+     */
     Uploader.supportXhr = function() {
         var input = document.createElement('input'),
             support;
@@ -196,7 +205,10 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return support;
     };
 
-    Uploader.pushIfExist = function(array, id) {
+    /**
+     * 如果数组中没有push进去
+     */
+    Uploader.pushIfNotExist = function(array, id) {
         var i = 0,
             l = array.length,
             existed = false;
@@ -213,6 +225,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return existed;
     };
 
+    /**
+     * 如果数组中有就移除
+     */
     Uploader.removeIfExist = function(array, id) {
         var i = 0,
             l = array.length;
@@ -239,6 +254,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         this.$container.append(this.$view);
     };
 
+    /**
+     * 设置上传按钮
+     */
     Uploader.prototype._setupButton = function() {
         var self = this;
         self.$container.html( G.format(self._option.buttonTmpl, self._option.name) );
@@ -264,6 +282,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         });
     };
 
+    /**
+     * 设置拖动上传区域
+     */
     Uploader.prototype._setupDrag = function() {
         var self = this;
         self.$drag = $(G.format(self._option.dragTmpl));
@@ -295,6 +316,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
             });
     };
 
+    /**
+     * 获取唯一标识
+     */
     Uploader.prototype._getUploadId = function() {
         return '__UPLOADERS-' + uniqueId++;
     };
@@ -322,6 +346,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         }
     };
 
+    /**
+     * 添加单个上传
+     */
     Uploader.prototype._addOneUpload = function(input) {
         if (this.count >= this.maxCount) {
             this.fire('addTooManyFiles', input, this.count);
@@ -341,6 +368,10 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return id;
     };
 
+    /**
+     * 移除上传
+     * @param {string} id
+     */
     Uploader.prototype.removeUpload = function(id) {
         var Klass = this.constructor,
             fileView = this._fileViews[id];
@@ -360,11 +391,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
 
     /**
      * 依据id获取文件名字
-     * NOTE: 当提交结束之后，便获取不到名字
      *
      * @param {string} id
      * @return {string} filename
-     *
      */
     Uploader.prototype.getFileName = function(id) {
         if (this.constructor.supportXhr() && !this._option.forceUseForm) {
@@ -375,6 +404,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         }
     };
 
+    /**
+     * 上传所有等待队列中的文件
+     */
     Uploader.prototype.uploadAll = function(id) {
         var i = 0,
             l = this._queue.length;
@@ -384,6 +416,10 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return this;
     };
 
+    /**
+     * 上传文件（单个或多个）
+     * @param {string/array} ids
+     */
     Uploader.prototype.upload = function(ids) {
         if (G.type(ids) === 'array') {
             var i = 0,
@@ -397,6 +433,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return this;
     };
 
+    /**
+     * 上传单个文件
+     */
     Uploader.prototype._uploadOne = function(id) {
         var fileName = this.getFileName(id),
             params;
@@ -424,6 +463,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return this;
     };
 
+    /**
+     * 取消正在上传中的文件，但不会移除队列
+     */
     Uploader.prototype.abort = function(id, isTimeout) {
         var abort = this._abortFunc[id];
         if (abort) {
@@ -451,7 +493,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         var Klass = this.constructor,
             re;
         Klass.removeIfExist(this._queue, id);
-        re = Klass.pushIfExist(this._waiting, id);
+        re = Klass.pushIfNotExist(this._waiting, id);
         this.fire('waiting', id);
         this.fire('stateChange', id, Klass.state.WAITING);
         return re;
@@ -468,12 +510,15 @@ G.def('MultipleUploader', ['Event'], function(Event) {
             re;
         Klass.removeIfExist(this._queue, id);
         Klass.removeIfExist(this._waiting, id);
-        re = Klass.pushIfExist(this._connections, id);
+        re = Klass.pushIfNotExist(this._connections, id);
         this.fire('uploading', id);
         this.fire('stateChange', id, Klass.state.UPLOADING);
         return re;
     };
 
+    /**
+     * 完成上传后执行的操作
+     */
     Uploader.prototype._finishConnection = function(id, state) {
         var Klass = this.constructor;
         Klass.removeIfExist(this._connections, id);
@@ -481,6 +526,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         this.fire('stateChange', id, state);
     };
 
+    /**
+     * 使用XMLHttpRequest上传
+     */
     Uploader.prototype._uploadByXhr = function(id, params) {
         var xhr = new XMLHttpRequest(),
             self = this,
@@ -543,6 +591,9 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         xhr.send(formData);
     };
 
+    /**
+     * 使用iframe+form上传
+     */
     Uploader.prototype._uploadByForm = function(id, params) {
         var self = this,
             timeoutInterval,
@@ -612,7 +663,7 @@ G.def('MultipleUploader', ['Event'], function(Event) {
     };
 
     /**
-     * get input dom or file
+     * 获取上传文件
      *
      * @param {string} id
      * @return {object} dom input / file object(File)
@@ -622,10 +673,16 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         return this._uploads[id];
     };
 
+    /**
+     * 获取上传文件对应的fileView
+     */
     Uploader.prototype.getFileView = function(id) {
         return this._fileViews[id];
     };
 
+    /**
+     * 移除整个组件，释放内存，删除添加的html
+     */
     Uploader.prototype.remove = function() {
         var self = this;
         self.$drag = null;

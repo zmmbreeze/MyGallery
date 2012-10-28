@@ -50,12 +50,5 @@ G.req(
         if (MultipleUploader.supportDrag()) {
             $html.addClass('jsdraggable');
         }
-        // --- hide address bar ---
-        /* window.addEventListener("load",function() {
-            setTimeout(function(){
-                window.scrollTo(0, 0);
-            }, 0);
-        });
-        */
     }
 );
