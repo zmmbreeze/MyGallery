@@ -151,8 +151,8 @@ public class Pictures extends HttpServlet {
         // upload time
         Date uploadTime = new Date();
         // result
-        Map<String, Object> re;  
-        
+        Map<String, Object> re;
+
         // log
         log.info("Upload image:" + 
         		fileName + 

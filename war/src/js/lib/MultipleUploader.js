@@ -519,11 +519,14 @@ G.def('MultipleUploader', ['Event'], function(Event) {
                 self._finishConnection(id, state);
             }
         };
-        xhr.open('POST', self.uploadUrl + '?' + $.param(params), true);
+        xhr.open('POST', self.uploadUrl, true);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
         xhr.setRequestHeader("Cache-Control", "no-cache");
+        // append data
         formData.append(self.uploadName, file);
+        G.each(params, function(v, k) {
+            formData.append(k, v);
+        });
 
         self._abortFunc[id] = function() {
             xhr.abort();
