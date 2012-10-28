@@ -128,3 +128,10 @@
         color:#888;
         text-decoration: none;
     }
+
+/* for desktop */
+@media all and (min-width: 1025px) {
+    .pictures li img {
+        height: 200px; /* for mac opera 11.64 bug */
+    }
+}
