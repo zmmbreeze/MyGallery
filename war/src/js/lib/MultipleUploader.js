@@ -291,16 +291,17 @@ G.def('MultipleUploader', ['Event'], function(Event) {
         self.$container.append(self.$drag);
         self.$drag.attr('draggable', 'draggable');
         self.$drag
-            .bind('dragenter.uploader', function() {
+            .bind('dragenter', function() {
                 self.$drag.addClass(self._option.dragStateClassPrefix + 'enter');
                 self.fire('dragenter');
             })
-            .bind('dragleave.uploader', function(e) {
+            .bind('dragleave', function(e) {
                 self.$drag.removeClass(self._option.dragStateClassPrefix + 'enter');
                 self.fire('dragleave');
             })
-            .bind('drop.uploader', function(e) {
+            .bind('drop', function(e) {
                 e.preventDefault();
+                self.$drag.removeClass(self._option.dragStateClassPrefix + 'enter');
                 var i = 0,
                     fileList = e.originalEvent.dataTransfer.files,
                     l = fileList.length,
