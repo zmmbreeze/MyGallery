@@ -13,20 +13,35 @@
     <link rel="stylesheet" href="/skin/fileuploader.css">
   </head>
 
-  <body>
-    <h1>Hello App Engine!</h1>
-    <div id="fileUploader"></div>
-    <script src="/js/fileuploader.js"></script>
-    <script type="text/javascript">
-    function createUploader() {
-        var uploader = new qq.FileUploader({
-            element: document.getElementById('fineUploader'),
-            // Use the relevant server script url here
-            action: 'yourServerScript'
-        });
-    }
-
-    window.onload = createUploader;
+<body>
+    <h1>Test Image loader!</h1>
+    <ul id="loadedImage">
+    </ul>
+    <script>
+    GJS_PRELOAD = ['jQuery', 'GUtils'];
     </script>
-  </body>
+    <script src="/src/js/G.js"></script>
+    <script>
+    G.req('loadImages', function(load) {
+        load(
+            [
+                'http://www.w3schools.com/images/w3schoolslogo.gif',
+                'http://www.guokr.com/gkimage/jr/y1/zk/jry1zk.jpg',
+                'http://www.guokr.com/gkimage/k9/fe/ju/k9feju.jpg',
+                'http://www.guokr.com/gkimage/7t/5g/35/7t5g35.jpg',
+                'http://www.guokr.com/i/2101072270',
+                'http://img1.guokr.com/gkimage/sp/gh/jo/spghjo.jpg',
+                'http://img1.guokr.com/gkimage/vj/gb/za/vjgbza.jpg'
+            ],
+            function(urls) {
+                var $loadedImage = $('#loadedImage'),
+                    i = 0,
+                    l = urls.length;
+                for (; i<l; i++) {
+                    $loadedImage.append('<li>' + urls[i] + '</li>');
+                }
+            });
+    });
+    </script>
+</body>
 </html>
