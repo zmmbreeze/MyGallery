@@ -25,7 +25,7 @@ G.def('loadImages', function() {
         // 命中缓存
         if (img.complete) {
             img = null;
-            callback();
+            callback(true);
             return;
         }
 
